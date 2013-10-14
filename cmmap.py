@@ -26,4 +26,9 @@ C = ffi.verify("""
 #include <sys/mman.h>
 """)
 
+
 globals().update({n: getattr(C, n) for n in dir(C)})
+
+
+def mmap(addr=ffi.NULL, length=0, prot=PROT_NONE, flags=MAP_PRIVATE, fd=0, offset=0):
+    return C.mmap(addr, length, prot, flags, fd, offset)
