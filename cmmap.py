@@ -20,19 +20,27 @@ ffi.cdef("""
 #define MAP_STACK ...
 
 void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
+void *offset(void *mapped, size_t offset);
 """)
 
 C = ffi.verify("""
 #include <sys/mman.h>
+
+void *offset(void *mapped, size_t offset) {
+    return (void*)((char*)mapped + offset);
+}
 """)
 
 
 globals().update({n: getattr(C, n) for n in dir(C)})
 
 
-def mmap(addr=ffi.NULL, length=0, prot=PROT_NONE, flags=MAP_PRIVATE, fd=0, offset=0):
+def mmap(addr=ffi.NULL, length=0, prot=PROT_NONE, flags=MAP_PRIVATE, fd=0, offset=0, buffer=True):
     m = C.mmap(addr, length, prot, flags, fd, offset)
     if m == -1:
         return None
-    return ffi.buffer(m, length)
+    if buffer:
+        return ffi.buffer(m, length)
+    return m
+
 

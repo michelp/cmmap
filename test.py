@@ -37,7 +37,12 @@ def test_anonymous_shared():
     proc.start()
     proc.join()
     assert m[:] == 'doobarding'
-    
 
-    
-        
+def test_anonymous_private():
+    data = 'foobarding'
+    m = cmmap.mmap(length=10, 
+                   prot=cmmap.PROT_READ|cmmap.PROT_WRITE,
+                   flags=cmmap.MAP_ANONYMOUS|cmmap.MAP_PRIVATE,
+                   buffer=False)
+    m[:] = data
+    assert m[:] == data
